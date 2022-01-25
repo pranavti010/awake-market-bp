@@ -9,7 +9,7 @@ function renderEditorsPicks($atts = []) {
     $leftSectionBlogs = $rightSectionBlogs = [];
     $args = array(
         'post_type' => 'post',
-        'post_status' => 'publish',
+        'post_status' => array('publish','private'),
         'orderby' => 'date',
         'order' => 'DESC',
         'posts_per_page' => 3
@@ -20,40 +20,46 @@ function renderEditorsPicks($atts = []) {
             $args['posts_per_page'] = 4;
         }
     }
+    if(isset($atts) && !empty($atts) && isset($atts['for_author'])) $args['author'] = $atts['for_author'];
     $allBlogs = get_posts($args);
     $totalBlogs = count($allBlogs);
     foreach ($allBlogs as $key => $blog) {
-        if($displayLayout == "1") {
-            if($key == 0) {
-                $leftSectionClassName = "col-sm-8";
-                array_push($leftSectionBlogs, $blog);
-            }
-            else {
-                $rightSectionClassName = "col-sm-4";
-                array_push($rightSectionBlogs, $blog);
-            }
+        if ($totalBlogs == 1) {
+            $leftSectionClassName = "col-sm-12";
+            array_push($leftSectionBlogs, $blog);
         }
-        elseif($displayLayout == "2") {
-            list($array1, $array2) = array_chunk($allBlogs, ceil(count($allBlogs) / 2));
-            $rightSectionBlogs = $array1;
-            $leftSectionBlogs = $array2;
-            $leftSectionClassName = $rightSectionClassName = "col-sm-6";
-        }
-        elseif($displayLayout == "3"){
-            if($key == ($totalBlogs - 1)) {
-                $rightSectionClassName = "col-sm-8";
-                array_push($rightSectionBlogs, $blog);
+        else {
+            if($displayLayout == "1") {
+                if($key == 0) {
+                    $leftSectionClassName = "col-sm-8";
+                    array_push($leftSectionBlogs, $blog);
+                }
+                else {
+                    $rightSectionClassName = "col-sm-4";
+                    array_push($rightSectionBlogs, $blog);
+                }
             }
-            else {
-                $leftSectionClassName = "col-sm-4";
-                array_push($leftSectionBlogs, $blog);
+            elseif($displayLayout == "2") {
+                list($array1, $array2) = array_chunk($allBlogs, ceil(count($allBlogs) / 2));
+                $rightSectionBlogs = $array1;
+                $leftSectionBlogs = $array2;
+                $leftSectionClassName = $rightSectionClassName = "col-sm-6";
             }
+            elseif($displayLayout == "3"){
+                if($key == ($totalBlogs - 1)) {
+                    $rightSectionClassName = "col-sm-8";
+                    array_push($rightSectionBlogs, $blog);
+                }
+                else {
+                    $leftSectionClassName = "col-sm-4";
+                    array_push($leftSectionBlogs, $blog);
+                }
+            }
+            else $className = "col-sm-4";
         }
-        else $className = "col-sm-4";
     }
 
-    if (count($rightSectionBlogs) > 0 && count($leftSectionBlogs) > 0) {
-        // Iterate leftSectionBlogs ?>
+    if (count($leftSectionBlogs) > 0) : ?>
         <div class="<?php echo $leftSectionClassName; ?>">
             <?php foreach ($leftSectionBlogs as $leftSectionBlog) : ?>
                 <div class="single-blog">
@@ -74,7 +80,8 @@ function renderEditorsPicks($atts = []) {
                 </div>
             <?php endforeach; ?>
         </div>
-
+    <?php endif;
+    if (count($rightSectionBlogs) > 0) : ?>
         <div class="<?php echo $rightSectionClassName; ?>">
             <?php // Iterate rightSectionBlogs
             foreach ($rightSectionBlogs as $rightSectionBlog) : ?>
@@ -96,7 +103,7 @@ function renderEditorsPicks($atts = []) {
                 </div>
             <?php endforeach; ?>
         </div>
-    <?php }
+    <?php endif;
     return ob_get_clean();
 }
 add_shortcode('awake_editors_picks','renderEditorsPicks');
