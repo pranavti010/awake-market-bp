@@ -61,7 +61,11 @@ function renderEditorsPicks($atts = []) {
 
     if (count($leftSectionBlogs) > 0) : ?>
         <div class="<?php echo $leftSectionClassName; ?>">
-            <?php foreach ($leftSectionBlogs as $leftSectionBlog) : ?>
+            <?php foreach ($leftSectionBlogs as $leftSectionBlog) :
+                $categoryName = "";
+                $categories = get_the_category($leftSectionBlog->ID);
+                if ( ! empty( $categories ) ) $categoryName = $categories[0]->name;
+                ?>
                 <div class="single-blog">
                     <div class="blog-image">
                         <a href="<?php echo get_permalink($leftSectionBlog->ID); ?>">
@@ -76,7 +80,9 @@ function renderEditorsPicks($atts = []) {
                         <h4 class="blog-title"><?php echo $leftSectionBlog->post_title; ?></h4>
                         <!-- <p class="blog-short-desc"><?php// echo $blog['content']; ?></p> -->
                     </div>
-                    <span class="category-badge"><p>Health & Lifestyle</p></span>
+                    <?php if(!empty($categoryName)) : ?>
+                        <span class="category-badge"><p><?php echo $categoryName; ?></p></span>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -84,7 +90,11 @@ function renderEditorsPicks($atts = []) {
     if (count($rightSectionBlogs) > 0) : ?>
         <div class="<?php echo $rightSectionClassName; ?>">
             <?php // Iterate rightSectionBlogs
-            foreach ($rightSectionBlogs as $rightSectionBlog) : ?>
+            foreach ($rightSectionBlogs as $rightSectionBlog) :
+                $categoryName = "";
+                $categories = get_the_category($rightSectionBlog->ID);
+                if ( ! empty( $categories ) ) $categoryName = $categories[0]->name;
+                ?>
                 <div class="single-blog">
                     <div class="blog-image">
                         <a href="<?php echo get_permalink($rightSectionBlog->ID); ?>">
@@ -99,7 +109,9 @@ function renderEditorsPicks($atts = []) {
                         <h4 class="blog-title"><?php echo $rightSectionBlog->post_title; ?></h4>
                         <!-- <p class="blog-short-desc"><?php// echo $blog['content']; ?></p> -->
                     </div>
-                    <span class="category-badge"><p>Health & Lifestyle</p></span>
+                    <?php if(!empty($categoryName)) : ?>
+                        <span class="category-badge"><p><?php echo $categoryName; ?></p></span>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>

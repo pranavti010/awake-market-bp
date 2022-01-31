@@ -4,27 +4,34 @@
 // ..............................
 function renderAwakeCosellers($atts = []) {
     ob_start();
-    $forListing = 0;
-    // We need to handle this since desktop and mobile have different layouts.
-    if(!wp_is_mobile()) {
-        $outerClass = $atts['outer_class']." d-sm-block d-none";
-        $wrapperClass = "cosellers-wrapper";
-        $showSliderDiv = false;
-    }
-    else {
-        $outerClass = "d-block d-sm-none";
-        $wrapperClass = "m-cosellers";
-        $showSliderDiv = true;
-    }
-    // Need to add other attributes here such as is_slider, slides_to_show
+    $forListing = $showSliderDiv = false;
+    $outerClass = $atts['outer_class'];
+    $wrapperClass = "cosellers-wrapper";
+    $showSliderDiv = false;
+
+    // Get cosellers list
     $args = array(
         'role__in' => array('coseller'),
         'order' => 'DESC',
         'orderby' => 'date'
     );
-    if(isset($atts) && !empty($atts) && isset($atts['per_row'])) $args['number'] = $atts['per_row'];
-    if(isset($atts) && !empty($atts) && isset($atts['for_listing'])) $forListing = $atts['for_listing'];
 
+    // Need to add other attributes here such as is_slider, slides_to_show
+    if(isset($atts) && !empty($atts) && isset($atts['per_row'])) $args['number'] = $atts['per_row'];
+    if(isset($atts) && !empty($atts) && isset($atts['for_listing'])) $forListing = true;
+    // We need to handle listing layuout conditionally
+    if (!$forListing) {
+        if(wp_is_mobile()) {
+            $outerClass = "d-block d-sm-none";
+            $wrapperClass = "m-cosellers";
+            $showSliderDiv = true;
+        }
+        else {
+            $outerClass = $atts['outer_class']." d-sm-block d-none";
+        }
+    }
+
+    // Query list
     $cosellers = get_users($args);
     if(count($cosellers) > 0) : ?>
         <div class="<?php echo $outerClass; ?>"> <!-- Outer Section -->
@@ -39,7 +46,7 @@ function renderAwakeCosellers($atts = []) {
                     <?php if($showSliderDiv) : ?></div><?php endif; ?> <!-- End Wrapper Section -->
                 <?php endforeach; ?>
             </div>
-            <?php if(!$showSliderDiv && $forListing != 1) : ?>
+            <?php if(!$showSliderDiv && !$forListing) : ?>
                 <div class="cosellers-buttons">
                     <a href="<?php echo home_url('cosellers'); ?>" class="btn-blueRounded">View Coseller Page</a>
                     <?php if(!is_user_logged_in()) : ?>
@@ -52,7 +59,7 @@ function renderAwakeCosellers($atts = []) {
                     <div class="m-coseller-note">
                         <p>A platform for Influencers to start coselling and generate real money, real time.</p>
                     </div>
-                    <?php if($forListing != 1) : ?>
+                    <?php if(!$forListing) : ?>
                         <div class="m-cosellerbutton-container">
                             <a href="<?php echo home_url('cosellers'); ?>" class="btn-blueCornered">View Coseller Page</a>
                             <?php if(!is_user_logged_in()) : ?>

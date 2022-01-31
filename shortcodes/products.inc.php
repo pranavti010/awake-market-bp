@@ -11,35 +11,39 @@ function renderAwakeProducts($atts = []){
     .brand-image img {
         width: 70%;
     }
-    .products-container {
+    /* .products-container {
         display: flex;
         justify-content: flex-start;
         flex-wrap: wrap;
-    }
+    } */
     </style>
     <?php
-    // We need to handle this since desktop and mobile have different layouts.
-    if(!wp_is_mobile()) {
-        $outerClass = "d-sm-block d-none";
-        $wrapperClass = "product-wrapper";
-        $showSliderDiv = false;
-        $perRow = $atts['per_row'];
+    $vendorId = $tags = $perRow = $wrapperClass = "";
+    $forListing = $showSliderDiv = false;
+    // We need to check whether shortcode is for listing
+    if (isset($atts['for_listing']) && !empty($atts['for_listing']) && $atts['for_listing'] == 1){
+        $forListing = true;
     }
     else {
-        $outerClass = "m-product-container d-block d-sm-none";
-        $wrapperClass = "";
-        $showSliderDiv = true;
-        $perRow = 5;
+        if(!wp_is_mobile()) {
+            $outerClass = "d-sm-block d-none";
+            $wrapperClass = "product-wrapper";
+            $showSliderDiv = false;
+        }
+        else {
+            $outerClass = "m-product-container d-block d-sm-none";
+            $showSliderDiv = true;
+        }
     }
-    $vendorId = $tags = "";
     // Need to add other attributes here such as is_slider, slides_to_show
     if(isset($atts['vendor_id']) && !empty($atts['vendor_id'])) $vendorId = $atts['vendor_id'];
+    if(isset($atts['per_row']) && !empty($atts['per_row'])) $perRow = $atts['per_row'];
     if(isset($atts['tags']) && !empty($atts['tags'])) $tags = "tags=".$atts['tags'];
     $totalRows = 1; ?>
-    <div class="<?php echo $outerClass; ?>"> <!-- Outer Section -->
-        <?php if(!$showSliderDiv) : ?><div class="<?php echo $wrapperClass; ?>"><?php endif; ?> <!-- Wrapper Section -->
+    <?php if(!$forListing) :?><div class="<?php echo $outerClass; ?>"><?php endif; ?> <!-- Outer Section -->
+        <?php if(!$showSliderDiv && !$forListing) : ?><div class="<?php echo $wrapperClass; ?>"><?php endif; ?> <!-- Wrapper Section -->
             <?php for($i=1;$i<=$totalRows;$i++) { ?>
-                <div count="<?php echo $perRow; ?>" imageSize="150x150" vendorid="<?php echo $vendorId; ?>" <?php echo $tags; ?> class="products-container <?php echo ($showSliderDiv ? "m-product" : ""); ?>">
+                <div count="<?php echo $perRow; ?>" imageSize="150x150" vendorid="<?php echo $vendorId; ?>" <?php echo $tags; ?> class="products-container product-wrapper <?php echo ($showSliderDiv ? "m-product" : ""); ?>">
                     <?php if($showSliderDiv) : ?><div><?php endif; ?>
                         <div class="<?php echo $atts['product_classes']; ?>">
                             <div class="product-image">
@@ -51,12 +55,13 @@ function renderAwakeProducts($atts = []){
                                 <p class="am-product-title product-title">Product Title</p>
                                 <p class="am-product-vendor brand-title">Brand Title</p>
                             </div>
+                            <span class="amount-badge">XX.XX USD</span>
                         </div>
                     <?php if($showSliderDiv) : ?></div><?php endif; ?>
                 </div>
             <?php } ?>
-        <?php if(!$showSliderDiv) : ?></div><?php endif; ?> <!-- End Wrapper Section -->
-    </div> <!-- End Outer Section -->
+        <?php if(!$showSliderDiv && !$forListing) : ?></div><?php endif; ?> <!-- End Wrapper Section -->
+    <?php if(!$forListing) :?></div><?php endif; ?>  <!-- End Outer Section -->
     <?php return ob_get_clean();
 }
 add_shortcode('awake_products', 'renderAwakeProducts');
