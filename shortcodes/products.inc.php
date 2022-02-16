@@ -11,19 +11,12 @@ function renderAwakeProducts($atts = []){
     .brand-image img {
         width: 70%;
     }
-    /* .products-container {
-        display: flex;
-        justify-content: flex-start;
-        flex-wrap: wrap;
-    } */
     </style>
     <?php
     $vendorId = $tags = $perRow = $wrapperClass = "";
     $forListing = $showSliderDiv = false;
     // We need to check whether shortcode is for listing
-    if (isset($atts['for_listing']) && !empty($atts['for_listing']) && $atts['for_listing'] == 1){
-        $forListing = true;
-    }
+    if (isset($atts['for_listing']) && !empty($atts['for_listing']) && $atts['for_listing'] == 1) $forListing = true;
     else {
         if(!wp_is_mobile()) {
             $outerClass = "d-sm-block d-none";

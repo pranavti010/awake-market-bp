@@ -5,9 +5,9 @@
 function renderAwakeCosellers($atts = []) {
     ob_start();
     $forListing = $showSliderDiv = false;
+    $showViewCosellerBtn = true;
     $outerClass = $atts['outer_class'];
     $wrapperClass = "cosellers-wrapper";
-    $showSliderDiv = false;
 
     // Get cosellers list
     $args = array(
@@ -17,8 +17,18 @@ function renderAwakeCosellers($atts = []) {
     );
 
     // Need to add other attributes here such as is_slider, slides_to_show
-    if(isset($atts) && !empty($atts) && isset($atts['per_row'])) $args['number'] = $atts['per_row'];
-    if(isset($atts) && !empty($atts) && isset($atts['for_listing'])) $forListing = true;
+    if(isset($atts) && !empty($atts)) {
+        if(isset($atts['per_row'])) $args['number'] = $atts['per_row'];
+        if(isset($atts['for_listing'])) $forListing = true;
+        if(isset($atts['show_coseller_button']) && $atts['show_coseller_button'] == 0) $showViewCosellerBtn = false;
+        if(isset($atts['per_row_desktop']) && $atts['per_row_desktop'] > 0 && !wp_is_mobile()) $args['number'] = $atts['per_row_desktop'];
+        if(isset($atts['per_row_mobile']) && $atts['per_row_mobile'] > 0 && wp_is_mobile()) $args['number'] = $atts['per_row_mobile'];
+        if(isset($atts['order_by']) && $atts['order_by'] == 2){
+            $args['orderby'] = 'post_count';
+            // $args['who'] = 'authors';
+        }
+        if(isset($atts['order']) && $atts['order'] == 1) $args['order'] = 'ASC';
+    }
     // We need to handle listing layuout conditionally
     if (!$forListing) {
         if(wp_is_mobile()) {
@@ -48,7 +58,9 @@ function renderAwakeCosellers($atts = []) {
             </div>
             <?php if(!$showSliderDiv && !$forListing) : ?>
                 <div class="cosellers-buttons">
-                    <a href="<?php echo home_url('cosellers'); ?>" class="btn-blueRounded">View Coseller Page</a>
+                    <?php if($showViewCosellerBtn) : ?>
+                        <a href="<?php echo home_url('cosellers'); ?>" class="btn-blueRounded">View Coseller Page</a>
+                    <?php endif; ?>
                     <?php if(!is_user_logged_in()) : ?>
                         <a href="<?php echo home_url('login'); ?>" class="btn-blueRounded">Be a Coseller!</a>
                     <?php endif; ?>
@@ -61,7 +73,9 @@ function renderAwakeCosellers($atts = []) {
                     </div>
                     <?php if(!$forListing) : ?>
                         <div class="m-cosellerbutton-container">
-                            <a href="<?php echo home_url('cosellers'); ?>" class="btn-blueCornered">View Coseller Page</a>
+                            <?php if($showViewCosellerBtn) : ?>
+                                <a href="<?php echo home_url('cosellers'); ?>" class="btn-blueCornered">View Coseller Page</a>
+                            <?php endif; ?>
                             <?php if(!is_user_logged_in()) : ?>
                                 <a href="<?php echo home_url('login'); ?>" class="btn-blueCornered">Be a Coseller!</a>
                             <?php endif; ?>
